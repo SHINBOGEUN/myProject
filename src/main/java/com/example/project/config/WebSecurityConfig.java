@@ -40,7 +40,6 @@ public class WebSecurityConfig {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) // 토큰 기반 인증이므로 세션 역시 사용하지 않습니다.
                 .and()
                 .authorizeRequests() // 요청에 대한 사용권한 체크
-                .antMatchers( "/project/ex/**").permitAll() // pam upload
                 .antMatchers( "/project/ex/authentication/join", "/project/ex/authentication/token").permitAll() // join
                 .antMatchers( "/swagger-ui/**","/swagger-ui.html","/swagger-resources/**").permitAll() // Swagger Support
 //                .antMatchers("/admin/**").hasRole("ADMIN")

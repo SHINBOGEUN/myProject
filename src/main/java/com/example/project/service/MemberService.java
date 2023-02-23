@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
+
 @Service
 @Log4j2
 @RequiredArgsConstructor
@@ -43,5 +45,10 @@ public class MemberService {
         }
         return jwtTokenProvider.crateToken(member.getMemberId(), member.getMemberRole());
 
+    }
+
+    public Member getLoginInfo(HttpServletRequest request) throws IllegalAccessException {
+        return memberRepository.findById(jwtTokenProvider.getUserId(jwtTokenProvider.resolveToken(request)))
+                .orElseThrow(()-> new IllegalAccessException("Invalid request"));
     }
 }

@@ -16,11 +16,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
@@ -48,7 +46,22 @@ public class MemberController  {
     @PostMapping("/token")
     @ApiOperation(value = "로그인 성공 시 토큰 생성")
     public TokenDto login(@RequestBody LoginDTO loginDTO){
-        TokenDto token = memberService.getToken(loginDTO);
-        return token;
+        try {
+            return memberService.getToken(loginDTO);
+        }catch (Exception e){
+            log.error(e);
+            return null;
+        }
+    }
+
+    @GetMapping("/me")
+    @ApiOperation(value = "로그인 한 유저의 정보 가져오기")
+    public Member loginInfo(HttpServletRequest request){
+        try {
+            return memberService.getLoginInfo(request);
+        }catch (Exception e){
+            log.error(e);
+            return null;
+        }
     }
 }
