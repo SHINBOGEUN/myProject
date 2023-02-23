@@ -51,4 +51,14 @@ public class MemberService {
         return memberRepository.findById(jwtTokenProvider.getUserId(jwtTokenProvider.resolveToken(request)))
                 .orElseThrow(()-> new IllegalAccessException("Invalid request"));
     }
+    public Member updateMember(MemberDto memberDto) {
+        Member member = new Member();
+        member.setEmail(memberDto.getEmail());
+        member.setName(memberDto.getName());
+        member.setPassword(memberDto.getPassword());
+        member.setMemberId(memberDto.getMemberId());
+        member.setPhone(memberDto.getPhone());
+        memberRepository.save(member);
+        return member;
+    }
 }

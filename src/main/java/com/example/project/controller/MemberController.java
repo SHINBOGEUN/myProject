@@ -64,4 +64,17 @@ public class MemberController  {
             return null;
         }
     }
+    @PostMapping("/update")
+    @ApiOperation(value = "회원 정보 수정")
+    public Member updateMemberInfo(@RequestBody MemberDto memberDto){
+        try {
+            Member postUpdateMember = memberService.updateMember(memberDto);
+            postUpdateMember.setPassword("");
+            return postUpdateMember;
+        }catch (Exception e){
+            log.error(e);
+            return null;
+        }
+    }
+
 }
