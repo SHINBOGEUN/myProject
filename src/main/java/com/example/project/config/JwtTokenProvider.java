@@ -1,5 +1,7 @@
 package com.example.project.config;
 
+import com.example.project.dto.TokenDto;
+import com.example.project.entity.Role;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
+import java.time.Duration;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
@@ -24,8 +27,8 @@ public class JwtTokenProvider {
     @Value("${jwt.secretKey}")
     private String secretKey;
 
-    // 토큰 유효시간 30분
-    private long tokenValidTime = 30 * 60 * 1000L;
+    private long accessTokenValidTime = 2 * 60 * 60 * 1000L;  //2시간
+    private long refreshTokenValidTime = 90 * 24 * 60 * 60 * 1000L; //90일
 
     private final UserDetailsService userDetailsService;
 
@@ -36,16 +39,21 @@ public class JwtTokenProvider {
     }
 
     // JWT 토큰 생성
-    public String createToken(String userId, List<String> roles) {
-        Claims claims = Jwts.claims().setSubject(userId); // JWT payload 에 저장되는 정보단위
-        claims.put("roles", roles); // 정보는 key / value 쌍으로 저장된다.
+    public TokenDto crateToken(String userId, Role roles){
+        Claims claims = Jwts.claims().setSubject(userId);
+        claims.put("ROLE", roles);
+        String accessToken = generateToken(claims, accessTokenValidTime);
+        String refreshToken = generateToken(claims, refreshTokenValidTime);
+        return new TokenDto("Bearer", accessToken, refreshToken);
+    }
+
+    private String generateToken(Claims claims, long validTime){
         Date now = new Date();
         return Jwts.builder()
-                .setClaims(claims) // 정보 저장
-                .setIssuedAt(now) // 토큰 발행 시간 정보
-                .setExpiration(new Date(now.getTime() + tokenValidTime)) // set Expire Time
-                .signWith(SignatureAlgorithm.HS256, secretKey)  // 사용할 암호화 알고리즘과
-                // signature 에 들어갈 secret값 세팅
+                .setClaims(claims)
+                .setIssuedAt(now)
+                .setExpiration(new Date(now.getTime() + validTime))
+                .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
     }
 

@@ -5,12 +5,14 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Collections;
 
 @Entity
 @NoArgsConstructor
@@ -43,17 +45,12 @@ public class Member implements UserDetails, Serializable {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
-    }
-
-    @Override
-    public String getPassword() {
-        return null;
+        return Collections.singleton(new SimpleGrantedAuthority(this.memberRole.toString()));
     }
 
     @Override
     public String getUsername() {
-        return null;
+        return memberId;
     }
 
     @Override
