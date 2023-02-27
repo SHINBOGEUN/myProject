@@ -7,7 +7,11 @@ import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,9 +28,12 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Component
+@Log4j2
 public class JwtTokenProvider {
     @Value("${jwt.secretKey}")
     private String secretKey;
+    @Autowired
+    private RedisTemplate<String, String> redisTemplate;
 
     private long accessTokenValidTime = 2 * 60 * 60 * 1000L;  //2시간
     private long refreshTokenValidTime = 90 * 24 * 60 * 60 * 1000L; //90일
@@ -47,6 +54,8 @@ public class JwtTokenProvider {
         claims.put("ROLE", roles);
         String accessToken = generateToken(claims, accessTokenValidTime);
         String refreshToken = generateToken(claims, refreshTokenValidTime);
+        ValueOperations<String, String> token = redisTemplate.opsForValue();
+        token.set(userId, refreshToken, Duration.ofMillis(refreshTokenValidTime));
         return new TokenDto("Bearer", accessToken, refreshToken);
     }
 
@@ -71,13 +80,32 @@ public class JwtTokenProvider {
         return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
     }
 
-    // Request의 Header에서 token 값을 가져옵니다. "X-AUTH-TOKEN" : "TOKEN값'
+    // Request의 Header에서 token 값을 가져옵니다.
     public String resolveToken(HttpServletRequest request){
         String bearerToken = request.getHeader("Authorization");
         if(StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")){
             return bearerToken.substring(7);
         }
         return null;
+    }
+    public TokenDto regenerationToken(String jwtToken){
+        String userId = getUserId(jwtToken);
+        ValueOperations<String, String> values = redisTemplate.opsForValue();
+        String savedRefreshToken = values.get(userId);
+        if (savedRefreshToken !=null){
+            Date now = new Date();
+            Claims claims = Jwts.claims().setSubject(userId);
+            Claims body = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(jwtToken).getBody();
+            log.info("==================="+body);
+            String accessToken = Jwts.builder()
+                    .setClaims(claims)
+                    .setIssuedAt(now)
+                    .setExpiration(new Date(now.getTime() + accessTokenValidTime))
+                    .signWith(SignatureAlgorithm.HS256, secretKey)
+                    .compact();
+            return new TokenDto("Bearer", accessToken, savedRefreshToken);
+        }
+        throw new IllegalStateException("오류 발생 입니다.");
     }
 
     // 토큰의 유효성 + 만료일자 확인
@@ -88,6 +116,22 @@ public class JwtTokenProvider {
         } catch (Exception e) {
             return false;
         }
+    }
+    public boolean deleteToken(String jwtToken) {
+        try {
+            String userId = getUserId(jwtToken);
+            String tokenOnly = jwtToken.substring(0, jwtToken.lastIndexOf('.') + 1);
+            Date expiration = ((Claims)Jwts.parser().parse(tokenOnly).getBody()).getExpiration();
+            Date now = new Date();
+            Long expirationPeriod = (expiration.getTime() -  now.getTime()) / 1000;
+            ValueOperations<String, String> values = redisTemplate.opsForValue();
+            redisTemplate.delete(userId);
+            values.set(jwtToken + "_BK", userId, Duration.ofSeconds(expirationPeriod));
+            return true;
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return false;
     }
 }
 

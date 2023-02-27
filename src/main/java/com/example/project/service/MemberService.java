@@ -61,4 +61,12 @@ public class MemberService {
         memberRepository.save(member);
         return member;
     }
+
+    public TokenDto getGenerrationToken(HttpServletRequest request){
+        return jwtTokenProvider.regenerationToken(jwtTokenProvider.resolveToken(request));
+    }
+
+    public boolean getLogoutToken(HttpServletRequest request){
+        return jwtTokenProvider.deleteToken(jwtTokenProvider.resolveToken(request));
+    }
 }

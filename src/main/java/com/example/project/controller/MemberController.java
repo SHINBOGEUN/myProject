@@ -29,6 +29,8 @@ import java.util.Map;
 public class MemberController  {
     @Autowired
     private MemberService memberService;
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
 
     //회원가입
     @PostMapping("/join")
@@ -77,4 +79,26 @@ public class MemberController  {
         }
     }
 
+    @PostMapping("/regeneration")
+    @ApiOperation(value = "토큰 재생성")
+    public TokenDto regenerationToken(HttpServletRequest request){
+        try {
+            return memberService.getGenerrationToken(request);
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+        return null;
+    }
+    
+    @PostMapping("/delete")
+    @ApiOperation(value = "토큰 삭제")
+    public boolean logout(HttpServletRequest request){
+        try {
+            memberService.getLogoutToken(request);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return false;
+    }
 }
