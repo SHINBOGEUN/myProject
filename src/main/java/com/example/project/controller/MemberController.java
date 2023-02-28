@@ -5,22 +5,15 @@ import com.example.project.dto.LoginDTO;
 import com.example.project.dto.MemberDto;
 import com.example.project.dto.TokenDto;
 import com.example.project.entity.Member;
-import com.example.project.repository.MemberRepository;
 import com.example.project.service.MemberService;
-import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-
 import javax.servlet.http.HttpServletRequest;
-import java.nio.charset.StandardCharsets;
-import java.util.Map;
 
 @RequiredArgsConstructor
 @RestController
@@ -29,42 +22,40 @@ import java.util.Map;
 public class MemberController  {
     @Autowired
     private MemberService memberService;
-    @Autowired
-    private JwtTokenProvider jwtTokenProvider;
 
     //회원가입
     @PostMapping("/join")
     @ApiOperation(value = "회원을 가입하는 메소드 성공 시 회원 정보를 리턴")
-    public Member signUp(@RequestBody MemberDto memberDto){
-        try{
+    public ResponseEntity signUp(@RequestBody MemberDto memberDto){
+        try {
             Member member = memberService.insertMember(memberDto);
-            log.info("Message : {}, Member ID : {}", "successfully joined", memberDto.toString());
-            return member;
+            return new ResponseEntity(member, HttpStatus.OK);
         }catch (Exception e){
             log.error(e);
-            return null;
+            return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
         }
     }
     @PostMapping("/token")
     @ApiOperation(value = "로그인 성공 시 토큰 생성")
-    public TokenDto login(@RequestBody LoginDTO loginDTO){
+    public ResponseEntity login(@RequestBody LoginDTO loginDTO){
         try {
-            return memberService.getToken(loginDTO);
+            return new ResponseEntity(memberService.getToken(loginDTO), HttpStatus.OK);
         }catch (Exception e){
             log.error(e);
-            return null;
+            return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
         }
     }
 
     @GetMapping("/me")
     @ApiOperation(value = "로그인 한 유저의 정보 가져오기")
-    public Member loginInfo(HttpServletRequest request){
+    public ResponseEntity loginInfo(HttpServletRequest request){
         try {
-            return memberService.getLoginInfo(request);
+            return new ResponseEntity(memberService.getLoginInfo(request), HttpStatus.OK);
         }catch (Exception e){
             log.error(e);
-            return null;
+            return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
         }
+
     }
     @PostMapping("/update")
     @ApiOperation(value = "회원 정보 수정")
@@ -81,24 +72,23 @@ public class MemberController  {
 
     @PostMapping("/regeneration")
     @ApiOperation(value = "토큰 재생성")
-    public TokenDto regenerationToken(HttpServletRequest request){
+    public ResponseEntity regenerationToken(HttpServletRequest request){
         try {
-            return memberService.getGenerrationToken(request);
-        }catch (Exception ex){
-            ex.printStackTrace();
+            return new ResponseEntity(memberService.getGenerrationToken(request), HttpStatus.OK);
+        }catch (Exception e){
+            log.error(e);
+            return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
         }
-        return null;
     }
     
     @PostMapping("/delete")
     @ApiOperation(value = "토큰 삭제")
-    public boolean logout(HttpServletRequest request){
+    public ResponseEntity logout(HttpServletRequest request){
         try {
-            memberService.getLogoutToken(request);
+            return new ResponseEntity(memberService.getLogoutToken(request), HttpStatus.OK);
         }catch (Exception e){
-            e.printStackTrace();
+            log.error(e);
+            return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
         }
-
-        return false;
     }
 }

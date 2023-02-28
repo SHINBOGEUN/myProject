@@ -3,7 +3,6 @@ package com.example.project.config;
 
 import com.example.project.Message;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -18,8 +17,5 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
     private final ObjectMapper objectMapper = new ObjectMapper();
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-        response.setContentType("application/json");
-        response.setStatus(HttpStatus.UNAUTHORIZED.value());
-        response.getWriter().write(objectMapper.writeValueAsString(new Message(HttpStatus.UNAUTHORIZED, "Not available token", null)));
     }
 }
