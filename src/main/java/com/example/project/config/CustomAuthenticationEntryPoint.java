@@ -17,5 +17,8 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
     private final ObjectMapper objectMapper = new ObjectMapper();
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
+        response.setContentType("application/json");  // json 형태로 반환
+        response.setStatus(HttpStatus.UNAUTHORIZED.value()); //상태코드 401에러로 set
+        response.getWriter().write(objectMapper.writeValueAsString(new Message(HttpStatus.UNAUTHORIZED, "Unauthorized", null)));
     }
 }

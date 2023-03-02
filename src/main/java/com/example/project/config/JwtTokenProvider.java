@@ -88,6 +88,7 @@ public class JwtTokenProvider {
         }
         return null;
     }
+    // 토큰 재생성
     public TokenDto regenerationToken(String jwtToken){
         String userId = getUserId(jwtToken);
         ValueOperations<String, String> values = redisTemplate.opsForValue();

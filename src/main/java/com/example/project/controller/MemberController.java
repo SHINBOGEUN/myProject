@@ -91,4 +91,11 @@ public class MemberController  {
             return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
         }
     }
+
+    @DeleteMapping("/withdrawal")
+    @ApiOperation(value = "회원 탈퇴")
+    public ResponseEntity withdrawal(){
+
+        return null;
+    }
 }
