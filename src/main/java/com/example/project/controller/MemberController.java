@@ -1,9 +1,7 @@
 package com.example.project.controller;
 
-import com.example.project.config.JwtTokenProvider;
 import com.example.project.dto.LoginDTO;
 import com.example.project.dto.MemberDto;
-import com.example.project.dto.TokenDto;
 import com.example.project.entity.Member;
 import com.example.project.service.MemberService;
 import io.swagger.annotations.ApiOperation;
@@ -59,14 +57,11 @@ public class MemberController  {
     }
     @PostMapping("/update")
     @ApiOperation(value = "회원 정보 수정")
-    public Member updateMemberInfo(@RequestBody MemberDto memberDto){
+    public ResponseEntity updateMemberInfo(@RequestBody MemberDto memberDto){
         try {
-            Member postUpdateMember = memberService.updateMember(memberDto);
-            postUpdateMember.setPassword("");
-            return postUpdateMember;
+            return new ResponseEntity(memberService.updateMember(memberDto), HttpStatus.OK);
         }catch (Exception e){
-            log.error(e);
-            return null;
+            return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -92,10 +87,10 @@ public class MemberController  {
         }
     }
 
-    @DeleteMapping("/withdrawal")
-    @ApiOperation(value = "회원 탈퇴")
-    public ResponseEntity withdrawal(){
-
-        return null;
-    }
+//    @DeleteMapping("/withdrawal")
+//    @ApiOperation(value = "회원 탈퇴")
+//    public ResponseEntity withdrawal(){
+//
+//        return null;
+//    }
 }
