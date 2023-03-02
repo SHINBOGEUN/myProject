@@ -1,12 +1,10 @@
 package com.example.project.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.checkerframework.checker.units.qual.C;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.data.annotation.CreatedDate;
-
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -24,6 +22,7 @@ public class Order implements Serializable {
     private String orderNumber;
     @Column(name = "order_time")
     @CreationTimestamp
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private LocalDateTime orderTime;
     @Column(name = "order_id")
     private String orderId;
@@ -37,9 +36,11 @@ public class Order implements Serializable {
     private Long totalAmount;
     @Column(name = "create_ts")
     @CreationTimestamp
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private LocalDateTime createTime;
     @Column(name = "update_ts")
     @UpdateTimestamp
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private LocalDateTime updateTime;
     @Column(name = "use_yn")
     private String isUse;
