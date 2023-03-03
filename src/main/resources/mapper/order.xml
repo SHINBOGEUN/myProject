@@ -1,0 +1,14 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.project.mapper.OrderMapper">
+    <sql id="orderWhere">
+        where <![CDATA[ od.order_time >= #{startDateTime} and od.order_time <= #{endDateTime} ]]>
+        <if test="ordererName != null">
+            and od.order_name like CONCAT('%', #{orderName}, '%') -- 주문자
+        </if>
+    </sql>
+    <select id="orderList" resultType="map" parameterType="map">
+        select * from order_data od
+        <include refid="orderWhere"></include>
+        order by od.order_time
+    </select>
+</mapper>

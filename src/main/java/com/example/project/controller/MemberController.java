@@ -7,6 +7,7 @@ import com.example.project.service.MemberService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 
 @RequiredArgsConstructor
 @RestController
-@Log4j2
+@Slf4j
 @RequestMapping("/project/ex/authentication")
 public class MemberController  {
     @Autowired
@@ -29,7 +30,7 @@ public class MemberController  {
             Member member = memberService.insertMember(memberDto);
             return new ResponseEntity(member, HttpStatus.OK);
         }catch (Exception e){
-            log.error(e);
+            log.error("exception msg", e);
             return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
         }
     }
@@ -39,7 +40,7 @@ public class MemberController  {
         try {
             return new ResponseEntity(memberService.getToken(loginDTO), HttpStatus.OK);
         }catch (Exception e){
-            log.error(e);
+            log.error("exception msg", e);
             return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
         }
     }
@@ -50,7 +51,7 @@ public class MemberController  {
         try {
             return new ResponseEntity(memberService.getLoginInfo(request), HttpStatus.OK);
         }catch (Exception e){
-            log.error(e);
+            log.error("exception msg", e);
             return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
         }
 
@@ -71,7 +72,7 @@ public class MemberController  {
         try {
             return new ResponseEntity(memberService.getGenerrationToken(request), HttpStatus.OK);
         }catch (Exception e){
-            log.error(e);
+            log.error("exception msg", e);
             return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
         }
     }
@@ -82,7 +83,7 @@ public class MemberController  {
         try {
             return new ResponseEntity(memberService.getLogoutToken(request), HttpStatus.OK);
         }catch (Exception e){
-            log.error(e);
+            log.error("exception msg", e);
             return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
         }
     }

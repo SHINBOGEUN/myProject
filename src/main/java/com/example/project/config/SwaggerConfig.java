@@ -30,12 +30,12 @@ public class SwaggerConfig extends WebMvcConfigurationSupport {
     public Docket api() {
         return new Docket(DocumentationType.OAS_30)
                 .consumes(getConsumeContentTypes())
-                .produces(getProduceContentTypes())
+                .produces(getProduceContentTypes())  // request response에 대한 설정
                 .securityContexts(Arrays.asList(securityContext()))
                 .securitySchemes(Arrays.asList(apiKey()))
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("com.example.project.controller"))
-                .paths(PathSelectors.any())
+                .apis(RequestHandlerSelectors.basePackage("com.example.project.controller")) // Swagger API 문서로 만들기 원하는 BasePackage 경로
+                .paths(PathSelectors.any()) // URL 경로를 지정하여 해당 URL에 해당하는 요청만 Swagger API 문서
                 .build()
                 .apiInfo(apiInfo());
     }

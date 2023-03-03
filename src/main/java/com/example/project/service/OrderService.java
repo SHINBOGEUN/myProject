@@ -1,21 +1,23 @@
 package com.example.project.service;
 
 import com.example.project.entity.Order;
+import com.example.project.mapper.OrderMapper;
 import com.example.project.repository.OrderRepository;
 import com.example.project.util.CreateOrderNumber;
 import lombok.extern.log4j.Log4j2;
-import org.aspectj.weaver.ast.Or;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.util.Map;
 
 @Service
 @Log4j2
 public class OrderService {
 
     @Autowired
-    private OrderRepository orderRepository;
+    OrderRepository orderRepository;
+    @Autowired
+    OrderMapper orderMapper;
 
     public Order insertOrder(Order paramOrder){
         String randomNumber = CreateOrderNumber.createOrderNumber();
@@ -31,7 +33,18 @@ public class OrderService {
         return order;
     }
     public Order getOrderOne(Long orderIdx){
-        Order savedOrder = orderRepository.findById(orderIdx).orElse(null);
-        return savedOrder;
+
+        return orderRepository.findById(orderIdx).orElse(null);
+    }
+
+    public Map getOrderList() {
+
+        return null;
+    }
+
+    public Map<String, Object> orderListMybatis(Map<String, Object> param) {
+
+        return orderMapper.orderList(param);
+
     }
 }
